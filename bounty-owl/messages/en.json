@@ -1,0 +1,98 @@
+{
+  "nav": {
+    "home": "Home",
+    "contests": "Contests",
+    "recommendations": "Recommendations",
+    "watchlist": "Watchlist",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "admin": "Admin",
+    "pricing": "Pricing",
+    "about": "About",
+    "login": "Login",
+    "logout": "Logout",
+    "signup": "Sign Up"
+  },
+  "hero": {
+    "badge": "AI predicts your win probability",
+    "title": "The Ultimate",
+    "titleHighlight": "Bounty Hunter",
+    "subtitle": "AI analyzes contests, hackathons, and competitions worldwide. We predict your win probability and expected earnings to show you exactly where to apply.",
+    "cta": "Start for Free",
+    "ctaSecondary": "View Demo"
+  },
+  "stats": {
+    "contests": "Registered Contests",
+    "prize": "Total Prize Pool",
+    "users": "Active Users",
+    "accuracy": "AI Accuracy"
+  },
+  "categories": {
+    "all": "All",
+    "novel": "Novel",
+    "illustration": "Illustration",
+    "programming": "Programming",
+    "ai": "AI",
+    "photography": "Photography",
+    "video": "Video",
+    "design": "Design"
+  },
+  "contest": {
+    "deadline": "Deadline",
+    "prize": "Prize",
+    "winProbability": "Win Probability",
+    "expectedValue": "Expected Value",
+    "difficulty": "Difficulty",
+    "matchScore": "Match Score",
+    "entries": "Est. Entries",
+    "applyNow": "Apply Now",
+    "addToWatchlist": "Save",
+    "removeFromWatchlist": "Saved",
+    "viewDetails": "View Details",
+    "aiSummary": "AI Summary",
+    "successPatterns": "Success Patterns",
+    "strategyReport": "AI Strategy Report (Premium)",
+    "organizer": "Organizer"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "activeContests": "Active Contests",
+    "totalPrize": "Total Prize Pool",
+    "watchlistCount": "Saved",
+    "newToday": "Added Today",
+    "topRecommendations": "Top Recommendations",
+    "recentActivity": "Recent Activity"
+  },
+  "pricing": {
+    "title": "Simple Pricing",
+    "subtitle": "Start for free, upgrade when ready",
+    "free": "Free",
+    "pro": "Pro",
+    "premium": "Premium",
+    "perMonth": "mo",
+    "startFree": "Start for Free",
+    "upgradePro": "Upgrade to Pro",
+    "upgradePremium": "Upgrade to Premium",
+    "currentPlan": "Current Plan",
+    "managePlan": "Manage Plan"
+  },
+  "onboarding": {
+    "title": "Set Up Your Profile",
+    "subtitle": "AI will find the best contests for you",
+    "step1": "Country",
+    "step2": "Languages",
+    "step3": "Categories",
+    "step4": "Experience Level",
+    "step5": "Skills & Achievements",
+    "next": "Next",
+    "back": "Back",
+    "complete": "Complete"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "notFound": "Page not found",
+    "unauthorized": "Login required",
+    "forbidden": "Access denied"
+  }
+}
