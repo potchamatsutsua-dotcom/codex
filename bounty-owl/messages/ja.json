@@ -1,0 +1,98 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "contests": "コンテスト",
+    "recommendations": "おすすめ",
+    "watchlist": "ウォッチリスト",
+    "dashboard": "ダッシュボード",
+    "profile": "プロフィール",
+    "admin": "管理画面",
+    "pricing": "料金",
+    "about": "について",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "signup": "新規登録"
+  },
+  "hero": {
+    "badge": "AIが勝率を予測する",
+    "title": "賞金ハンターの",
+    "titleHighlight": "最強の相棒",
+    "subtitle": "世界中のコンテスト・公募・ハッカソンをAIが分析。あなたの勝率・期待収益を予測し、今応募すべき案件を提示します。",
+    "cta": "無料で始める",
+    "ctaSecondary": "デモを見る"
+  },
+  "stats": {
+    "contests": "登録コンテスト数",
+    "prize": "総賞金額",
+    "users": "利用ユーザー数",
+    "accuracy": "AI予測精度"
+  },
+  "categories": {
+    "all": "すべて",
+    "novel": "小説",
+    "illustration": "イラスト",
+    "programming": "プログラミング",
+    "ai": "AI",
+    "photography": "写真",
+    "video": "動画",
+    "design": "デザイン"
+  },
+  "contest": {
+    "deadline": "締切",
+    "prize": "賞金",
+    "winProbability": "勝率",
+    "expectedValue": "期待収益",
+    "difficulty": "難易度",
+    "matchScore": "マッチ度",
+    "entries": "推定参加者",
+    "applyNow": "今すぐ応募",
+    "addToWatchlist": "保存",
+    "removeFromWatchlist": "保存済み",
+    "viewDetails": "詳細を見る",
+    "aiSummary": "AI要約",
+    "successPatterns": "攻略パターン",
+    "strategyReport": "AI攻略レポート (Premium)",
+    "organizer": "主催"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "welcome": "おかえりなさい",
+    "activeContests": "応募可能案件",
+    "totalPrize": "総賞金額",
+    "watchlistCount": "保存済み",
+    "newToday": "本日追加",
+    "topRecommendations": "おすすめコンテスト",
+    "recentActivity": "最近の活動"
+  },
+  "pricing": {
+    "title": "シンプルな料金体系",
+    "subtitle": "まずは無料で始めてみましょう",
+    "free": "Free",
+    "pro": "Pro",
+    "premium": "Premium",
+    "perMonth": "月",
+    "startFree": "無料で始める",
+    "upgradePro": "Proにアップグレード",
+    "upgradePremium": "Premiumにアップグレード",
+    "currentPlan": "現在のプラン",
+    "managePlan": "プランを管理"
+  },
+  "onboarding": {
+    "title": "プロフィール設定",
+    "subtitle": "AIがあなたに最適なコンテストを見つけます",
+    "step1": "居住国",
+    "step2": "使用言語",
+    "step3": "カテゴリ",
+    "step4": "経験レベル",
+    "step5": "実績・スキル",
+    "next": "次へ",
+    "back": "戻る",
+    "complete": "完了"
+  },
+  "errors": {
+    "generic": "エラーが発生しました",
+    "notFound": "ページが見つかりません",
+    "unauthorized": "ログインが必要です",
+    "forbidden": "アクセス権限がありません"
+  }
+}
