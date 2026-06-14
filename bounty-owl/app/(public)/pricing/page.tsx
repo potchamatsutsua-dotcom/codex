@@ -3,16 +3,15 @@ import { Check, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Navbar } from "@/components/layout/Navbar";
 import { getUser } from "@/lib/auth/server";
-import { getUserById } from "@/lib/db/users";
+
+export const metadata = {
+  title: "料金プラン",
+  description: "Bounty Owlの料金プラン。Free・Pro・Premiumの3プランからお選びください。",
+};
 
 export default async function PricingPage() {
   const authUser = await getUser();
-  let user = null;
-  if (authUser) {
-    try { user = await getUserById(authUser.id); } catch {}
-  }
 
   const plans = [
     {
@@ -97,8 +96,6 @@ export default async function PricingPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar user={user} />
-
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <Badge variant="secondary" className="mb-4">

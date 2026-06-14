@@ -1,20 +1,10 @@
 import Link from "next/link";
 import { ArrowRight, Target, Brain, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/layout/Navbar";
-import { getUser } from "@/lib/auth/server";
-import { getUserById } from "@/lib/db/users";
 
 export default async function AboutPage() {
-  const authUser = await getUser();
-  let user = null;
-  if (authUser) {
-    try { user = await getUserById(authUser.id); } catch {}
-  }
-
   return (
     <div className="min-h-screen">
-      <Navbar user={user} />
 
       <div className="container mx-auto px-4 py-16 max-w-3xl">
         <div className="text-center mb-16">

@@ -63,7 +63,10 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
+      },
+      fontWeight: {
+        black: "900",
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
