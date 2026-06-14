@@ -1,5 +1,3 @@
-"use server";
-
 import { supabaseAdmin } from "@/lib/db/client";
 import { analyzeContest } from "@/lib/ai/analyzer";
 import type { Contest } from "@/types";
