@@ -49,6 +49,7 @@ export interface Contest {
   image_url: string | null;
   tags: string[];
   eligibility: Record<string, unknown>;
+  source?: string | null;
   created_at: string;
   updated_at: string;
 }

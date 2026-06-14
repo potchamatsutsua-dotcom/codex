@@ -7,7 +7,7 @@ import { generateStrategyReport } from "@/lib/ai/analyzer";
 import { supabaseAdmin } from "@/lib/db/client";
 
 export async function POST(request: Request) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

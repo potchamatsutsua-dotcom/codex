@@ -40,7 +40,7 @@ async function getRecommendations(userId: string, sort: SortOption): Promise<Con
   return data
     .filter((m) => m.contests)
     .map((m) => ({
-      ...(m.contests as Record<string, unknown>),
+      ...(m.contests as unknown as Record<string, unknown>),
       contest_analysis: (m.contests as { contest_analysis?: unknown[] }).contest_analysis?.[0] ?? null,
       user_matches: {
         match_score: m.match_score,
@@ -55,7 +55,7 @@ async function getRecommendations(userId: string, sort: SortOption): Promise<Con
 async function refreshMatchesAction() {
   "use server";
   const { createSupabaseServerClient } = await import("@/lib/auth/server");
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
   await computeAllMatchesForUser(user.id);

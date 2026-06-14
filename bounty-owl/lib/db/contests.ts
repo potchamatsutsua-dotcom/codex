@@ -66,7 +66,7 @@ export async function getContests(options: GetContestsOptions = {}) {
   const { data, error, count } = await query;
   if (error) throw error;
 
-  return { contests: data as ContestWithMatch[], count };
+  return { contests: data as unknown as ContestWithMatch[], count };
 }
 
 export async function getContestById(id: string, userId?: string) {
@@ -82,7 +82,7 @@ export async function getContestById(id: string, userId?: string) {
     .single();
 
   if (error) throw error;
-  return data as ContestWithMatch;
+  return data as unknown as ContestWithMatch;
 }
 
 export async function createContest(contest: Omit<Contest, "id" | "created_at" | "updated_at">) {

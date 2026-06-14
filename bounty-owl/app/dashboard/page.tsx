@@ -25,7 +25,7 @@ async function completeOnboarding(data: OnboardingData) {
   "use server";
 
   const { createSupabaseServerClient } = await import("@/lib/auth/server");
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -81,7 +81,7 @@ export default async function DashboardPage() {
   const contests: ContestWithMatch[] = (matchData ?? [])
     .filter((m) => m.contests)
     .map((m) => ({
-      ...(m.contests as Record<string, unknown>),
+      ...(m.contests as unknown as Record<string, unknown>),
       contest_analysis:
         (m.contests as { contest_analysis?: unknown[] }).contest_analysis?.[0] ?? null,
       user_matches: {

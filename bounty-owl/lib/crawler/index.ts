@@ -1,11 +1,11 @@
 import { supabaseAdmin } from "@/lib/db/client";
 import { analyzeContest } from "@/lib/ai/analyzer";
-import type { Contest } from "@/types";
+import type { Contest, ContestCategory } from "@/types";
 
 interface CrawlSource {
   name: string;
   url: string;
-  category: string;
+  category: ContestCategory;
 }
 
 const CONTEST_SOURCES: CrawlSource[] = [

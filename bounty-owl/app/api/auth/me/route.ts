@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/auth/server";
 import { getUserById, getUserProfile, getSubscription, updateUser, updateUserProfile } from "@/lib/db/users";
 
 export async function GET() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -17,7 +17,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/auth/server";
 import { computeAllMatchesForUser } from "@/lib/ai/matcher";
 
 export async function POST() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
