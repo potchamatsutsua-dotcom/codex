@@ -1,19 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import createIntlMiddleware from "next-intl/middleware";
-import { locales, defaultLocale } from "@/lib/utils/i18n";
 
-const intlMiddleware = createIntlMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: "as-needed",
-});
-
-const protectedPaths = ["/dashboard", "/admin"];
-const authPaths = ["/login", "/signup"];
+const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
+const AUTH_PATHS = ["/login", "/signup"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  let response = NextResponse.next({
+    request: { headers: request.headers },
+  });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,6 +23,10 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
+          response = NextResponse.next({ request: { headers: request.headers } });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
         },
       },
     }
@@ -34,18 +34,23 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
-  const isAuthPath = authPaths.some((p) => pathname.startsWith(p));
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+  const isAuthPath = AUTH_PATHS.includes(pathname);
 
   if (isProtected && !user) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
   }
 
   if (isAuthPath && user) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
   }
 
-  return intlMiddleware(request);
+  return response;
 }
 
 export const config = {

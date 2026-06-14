@@ -1,13 +1,8 @@
 import type { NextConfig } from "next";
-import createNextIntlPlugin from "next-intl/plugin";
-
-const withNextIntl = createNextIntlPlugin("./lib/utils/i18n.ts");
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "**" },
-    ],
+    remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
   async headers() {
     return [
@@ -31,4 +26,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default nextConfig;

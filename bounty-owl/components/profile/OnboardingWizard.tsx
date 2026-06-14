@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { Check, ChevronRight, ChevronLeft, Globe, Languages, Layers, Award, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -70,7 +69,7 @@ const STEPS = [
 
 export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [step, setStep] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [data, setData] = useState<OnboardingData>({
     country: "",
     languages: [],
@@ -80,45 +79,24 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   });
 
   const canProceed = () => {
-    switch (step) {
-      case 0: return data.country !== "";
-      case 1: return data.languages.length > 0;
-      case 2: return data.categories.length > 0;
-      case 3: return data.experience_level !== "";
-      case 4: return true;
-      default: return false;
-    }
+    if (step === 0) return data.country !== "";
+    if (step === 1) return data.languages.length > 0;
+    if (step === 2) return data.categories.length > 0;
+    return true;
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (step < STEPS.length - 1) {
       setStep(step + 1);
-    } else {
-      setIsSubmitting(true);
-      try {
-        await onComplete(data);
-      } finally {
-        setIsSubmitting(false);
-      }
+      return;
     }
+    startTransition(async () => {
+      await onComplete(data);
+    });
   };
 
-  const toggleLanguage = (code: string) => {
-    setData((prev) => ({
-      ...prev,
-      languages: prev.languages.includes(code)
-        ? prev.languages.filter((l) => l !== code)
-        : [...prev.languages, code],
-    }));
-  };
-
-  const toggleCategory = (id: ContestCategory) => {
-    setData((prev) => ({
-      ...prev,
-      categories: prev.categories.includes(id)
-        ? prev.categories.filter((c) => c !== id)
-        : [...prev.categories, id],
-    }));
+  const toggle = <T extends string>(arr: T[], item: T, setter: (v: T[]) => void) => {
+    setter(arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item]);
   };
 
   return (
@@ -126,51 +104,43 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <span className="text-5xl mb-4 block">🦉</span>
-          <h1 className="text-2xl font-bold mb-2">プロフィール設定</h1>
-          <p className="text-muted-foreground">AIがあなたに最適なコンテストを見つけます</p>
+          <h1 className="text-2xl font-black mb-1">プロフィール設定</h1>
+          <p className="text-muted-foreground text-sm">AIがあなたに最適なコンテストを見つけます</p>
         </div>
 
+        {/* Step progress */}
         <div className="flex items-center justify-center gap-2 mb-8">
           {STEPS.map((s, i) => (
             <div key={i} className="flex items-center">
-              <div
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all",
-                  i < step
-                    ? "bg-primary text-primary-foreground"
-                    : i === step
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white"
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
+              <div className={cn(
+                "w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black transition-all",
+                i < step ? "bg-amber-500 text-white"
+                : i === step ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/30"
+                : "bg-muted text-muted-foreground"
+              )}>
                 {i < step ? <Check className="h-4 w-4" /> : i + 1}
               </div>
               {i < STEPS.length - 1 && (
-                <div className={cn("h-0.5 w-8 mx-1", i < step ? "bg-primary" : "bg-muted")} />
+                <div className={cn("h-0.5 w-6 mx-1 rounded-full transition-all", i < step ? "bg-amber-500" : "bg-muted")} />
               )}
             </div>
           ))}
         </div>
 
-        <div className="bg-card rounded-2xl border shadow-lg p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            {(() => { const Icon = STEPS[step].icon; return <Icon className="h-5 w-5 text-amber-500" />; })()}
+        <div className="bg-card rounded-2xl border shadow-sm p-6">
+          {/* Step title */}
+          <h2 className="text-base font-black mb-4 flex items-center gap-2">
+            {(() => { const Icon = STEPS[step].icon; return <Icon className="h-4 w-4 text-amber-500" />; })()}
             {STEPS[step].title}
           </h2>
 
+          {/* Step 0: Country */}
           {step === 0 && (
             <div className="grid grid-cols-2 gap-2">
               {COUNTRIES.map((c) => (
-                <button
-                  key={c.code}
-                  onClick={() => setData((prev) => ({ ...prev, country: c.code }))}
-                  className={cn(
-                    "flex items-center gap-2 p-3 rounded-xl border text-sm transition-all",
-                    data.country === c.code
-                      ? "border-primary bg-primary/10 text-primary font-medium"
-                      : "hover:bg-muted"
-                  )}
-                >
+                <button key={c.code} onClick={() => setData((p) => ({ ...p, country: c.code }))}
+                  className={cn("flex items-center gap-2.5 p-3 rounded-xl border text-sm transition-all text-left",
+                    data.country === c.code ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30 font-semibold text-amber-700 dark:text-amber-300" : "hover:bg-muted")}>
                   <span className="text-xl">{c.flag}</span>
                   <span>{c.name}</span>
                 </button>
@@ -178,99 +148,75 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             </div>
           )}
 
+          {/* Step 1: Languages */}
           {step === 1 && (
             <div className="grid grid-cols-2 gap-2">
               {LANGUAGES.map((l) => (
-                <button
-                  key={l.code}
-                  onClick={() => toggleLanguage(l.code)}
-                  className={cn(
-                    "flex items-center gap-2 p-3 rounded-xl border text-sm transition-all",
-                    data.languages.includes(l.code)
-                      ? "border-primary bg-primary/10 text-primary font-medium"
-                      : "hover:bg-muted"
-                  )}
-                >
+                <button key={l.code}
+                  onClick={() => toggle(data.languages, l.code, (v) => setData((p) => ({ ...p, languages: v })))}
+                  className={cn("flex items-center gap-2.5 p-3 rounded-xl border text-sm transition-all text-left",
+                    data.languages.includes(l.code) ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30 font-semibold text-amber-700 dark:text-amber-300" : "hover:bg-muted")}>
                   <span className="text-xl">{l.flag}</span>
-                  <span>{l.name}</span>
-                  {data.languages.includes(l.code) && (
-                    <Check className="h-3.5 w-3.5 ml-auto" />
-                  )}
+                  <span className="flex-1">{l.name}</span>
+                  {data.languages.includes(l.code) && <Check className="h-3.5 w-3.5 text-amber-500" />}
                 </button>
               ))}
             </div>
           )}
 
+          {/* Step 2: Categories */}
           {step === 2 && (
             <div className="grid grid-cols-1 gap-2">
               {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => toggleCategory(cat.id)}
-                  className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl border text-sm transition-all text-left",
-                    data.categories.includes(cat.id)
-                      ? "border-primary bg-primary/10 text-primary font-medium"
-                      : "hover:bg-muted"
-                  )}
-                >
+                <button key={cat.id}
+                  onClick={() => toggle(data.categories, cat.id, (v) => setData((p) => ({ ...p, categories: v })))}
+                  className={cn("flex items-center gap-3 p-3 rounded-xl border text-sm transition-all text-left",
+                    data.categories.includes(cat.id) ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30" : "hover:bg-muted")}>
                   <span className="text-2xl">{cat.emoji}</span>
-                  <div>
-                    <div className="font-medium">{cat.label}</div>
+                  <div className="flex-1">
+                    <div className={cn("font-semibold", data.categories.includes(cat.id) && "text-amber-700 dark:text-amber-300")}>{cat.label}</div>
                     <div className="text-xs text-muted-foreground">{cat.description}</div>
                   </div>
-                  {data.categories.includes(cat.id) && (
-                    <Check className="h-4 w-4 ml-auto shrink-0" />
-                  )}
+                  {data.categories.includes(cat.id) && <Check className="h-4 w-4 text-amber-500 shrink-0" />}
                 </button>
               ))}
             </div>
           )}
 
+          {/* Step 3: Experience */}
           {step === 3 && (
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {EXPERIENCE_LEVELS.map((level) => (
-                <button
-                  key={level.id}
-                  onClick={() => setData((prev) => ({ ...prev, experience_level: level.id }))}
-                  className={cn(
-                    "flex items-center justify-between p-4 rounded-xl border text-sm transition-all text-left",
-                    data.experience_level === level.id
-                      ? "border-primary bg-primary/10 text-primary font-medium"
-                      : "hover:bg-muted"
-                  )}
-                >
-                  <div>
-                    <div className="font-medium">{level.label}</div>
-                    <div className="text-xs text-muted-foreground">{level.description}</div>
-                  </div>
-                  {data.experience_level === level.id && <Check className="h-4 w-4" />}
+                <button key={level.id}
+                  onClick={() => setData((p) => ({ ...p, experience_level: level.id }))}
+                  className={cn("flex flex-col items-start p-4 rounded-xl border text-sm transition-all text-left",
+                    data.experience_level === level.id ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30" : "hover:bg-muted")}>
+                  <div className={cn("font-bold", data.experience_level === level.id && "text-amber-700 dark:text-amber-300")}>{level.label}</div>
+                  <div className="text-xs text-muted-foreground">{level.description}</div>
                 </button>
               ))}
             </div>
           )}
 
+          {/* Step 4: Skills */}
           {step === 4 && (
             <div>
               <p className="text-sm text-muted-foreground mb-3">
-                過去の受賞歴、代表作、資格など自由に入力してください（任意）
+                過去の受賞歴、代表作、資格など（任意）
               </p>
               <textarea
                 value={data.skills}
-                onChange={(e) => setData((prev) => ({ ...prev, skills: e.target.value }))}
-                placeholder="例：第3回〇〇小説賞受賞、Twitterフォロワー10万人、GitHub Stars 500以上、TOEIC 900点..."
-                className="w-full h-32 p-3 rounded-xl border bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                onChange={(e) => setData((p) => ({ ...p, skills: e.target.value }))}
+                placeholder="例：第3回〇〇小説賞受賞、TOEIC 900点、GitHub Stars 500以上..."
+                className="w-full h-28 p-3 rounded-xl border bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
             </div>
           )}
 
-          <div className="flex gap-3 mt-6">
+          {/* Navigation */}
+          <div className="flex gap-3 mt-5">
             {step > 0 && (
-              <Button
-                variant="outline"
-                onClick={() => setStep(step - 1)}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
                 <ChevronLeft className="h-4 w-4" />
                 戻る
               </Button>
@@ -278,20 +224,20 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             <Button
               variant="gradient"
               onClick={handleNext}
-              disabled={!canProceed() || isSubmitting}
-              className="flex-1"
+              disabled={!canProceed() || isPending}
+              className="flex-1 font-bold"
             >
-              {step === STEPS.length - 1 ? (
-                isSubmitting ? "設定中..." : "完了 🎉"
-              ) : (
-                <>
-                  次へ
-                  <ChevronRight className="h-4 w-4" />
-                </>
-              )}
+              {step === STEPS.length - 1
+                ? isPending ? "設定中..." : "完了 🎉"
+                : (<>次へ <ChevronRight className="h-4 w-4" /></>)
+              }
             </Button>
           </div>
         </div>
+
+        <p className="text-xs text-muted-foreground text-center mt-4">
+          あとでプロフィール設定からいつでも変更できます
+        </p>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { supabaseAdmin } from "@/lib/db/client";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://bountyowl.com";
 
@@ -9,12 +8,6 @@ const CATEGORIES = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { data: contests } = await supabaseAdmin
-    .from("contests")
-    .select("id, updated_at")
-    .eq("status", "active")
-    .limit(1000);
-
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
     { url: `${BASE_URL}/pricing`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
@@ -27,12 +20,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  const contestPages: MetadataRoute.Sitemap = (contests ?? []).map((contest) => ({
-    url: `${BASE_URL}/dashboard/contests/${contest.id}`,
-    lastModified: new Date(contest.updated_at),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+  let contestPages: MetadataRoute.Sitemap = [];
+
+  try {
+    const { supabaseAdmin } = await import("@/lib/db/client");
+    const { data: contests } = await supabaseAdmin
+      .from("contests")
+      .select("id, updated_at")
+      .eq("status", "active")
+      .limit(1000);
+
+    contestPages = (contests ?? []).map((c) => ({
+      url: `${BASE_URL}/dashboard/contests/${c.id}`,
+      lastModified: new Date(c.updated_at),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    // Env vars not set (e.g., during static build)
+  }
 
   return [...staticPages, ...contestPages];
 }

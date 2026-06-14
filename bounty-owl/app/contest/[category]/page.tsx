@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Trophy, Clock, ArrowRight } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/layout/Navbar";
 import { getContests } from "@/lib/db/contests";
 import { getCategoryLabel, formatCurrency, formatRelativeDate, getCategoryColor, cn } from "@/lib/utils";
 import { notFound } from "next/navigation";
@@ -14,22 +12,15 @@ const VALID_CATEGORIES: FilterCategory[] = [
   "video", "design", "startup", "research", "scholarship",
 ];
 
-interface Props {
-  params: { category: string };
-}
+interface Props { params: { category: string } }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = params.category as FilterCategory;
   if (!VALID_CATEGORIES.includes(category)) return {};
-
   const label = getCategoryLabel(category);
   return {
-    title: `${label}コンテスト一覧 | Bounty Owl`,
+    title: `${label}コンテスト一覧`,
     description: `${label}分野のコンテスト・公募・賞レース一覧。AIが勝率と期待収益を分析します。`,
-    openGraph: {
-      title: `${label}コンテスト一覧 | Bounty Owl`,
-      description: `${label}分野のコンテスト・公募・賞レース一覧。`,
-    },
   };
 }
 
@@ -41,76 +32,80 @@ export default async function ContestCategoryPage({ params }: Props) {
   const category = params.category as FilterCategory;
   if (!VALID_CATEGORIES.includes(category)) notFound();
 
-  const { contests } = await getContests({ category, limit: 20, sort: "deadline" });
+  const { contests } = await getContests({ category, limit: 24, sort: "deadline" });
   const label = getCategoryLabel(category);
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
+    <div className="container mx-auto px-4 py-12 max-w-6xl">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <Link href="/" className="hover:text-foreground transition-colors">ホーム</Link>
+        <span>/</span>
+        <span className="text-foreground font-medium">{label}コンテスト</span>
+      </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <Link href="/" className="hover:text-foreground">ホーム</Link>
-            <span>/</span>
-            <span>コンテスト</span>
-            <span>/</span>
-            <span className="text-foreground font-medium">{label}</span>
-          </div>
-          <h1 className="text-3xl font-bold">{label}コンテスト一覧</h1>
-          <p className="text-muted-foreground mt-2">
-            {contests.length}件のアクティブな{label}コンテスト・公募・賞レース
-          </p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-black mb-2">
+          {label}コンテスト一覧
+        </h1>
+        <p className="text-muted-foreground">
+          {contests.length}件のアクティブな{label}コンテスト・公募・賞レース
+        </p>
+      </div>
 
+      {contests.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
           {contests.map((contest) => (
-            <Card key={contest.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <span className={cn("text-xs px-2 py-0.5 rounded-full font-medium", getCategoryColor(category))}>
+            <div
+              key={contest.id}
+              className="bg-card rounded-2xl border overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all"
+            >
+              <div className={cn("h-1", getCategoryAccentClass(category))} />
+              <div className="p-4">
+                <span className={cn("inline-block text-xs font-semibold px-2 py-0.5 rounded-md mb-2", getCategoryColor(category))}>
                   {label}
                 </span>
-                <h2 className="font-semibold mt-2 mb-1 line-clamp-2">{contest.title}</h2>
+                <h2 className="font-bold text-sm leading-snug mb-1 line-clamp-2">{contest.title}</h2>
                 {contest.organizer && (
-                  <p className="text-xs text-muted-foreground mb-3">{contest.organizer}</p>
+                  <p className="text-xs text-muted-foreground mb-3 truncate">{contest.organizer}</p>
                 )}
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                <div className="flex items-center justify-between text-sm mb-3">
+                  <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
                     <Trophy className="h-3.5 w-3.5" />
                     {formatCurrency(contest.prize_amount, contest.currency)}
                   </span>
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Clock className="h-3.5 w-3.5" />
+                  <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                    <Clock className="h-3 w-3" />
                     {formatRelativeDate(contest.deadline)}
                   </span>
                 </div>
-                <Button variant="gradient" size="sm" className="w-full mt-3 h-8 text-xs" asChild>
+                <Button variant="gradient" size="sm" className="w-full h-8 text-xs" asChild>
                   <Link href={`/dashboard/contests/${contest.id}`}>
-                    詳細を見る
+                    詳細・応募
                     <ArrowRight className="h-3 w-3" />
                   </Link>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
-
-        {/* SEO content */}
-        <div className="prose prose-neutral dark:prose-invert max-w-none">
-          <h2>{label}コンテストで稼ぐ方法</h2>
-          <p>
-            Bounty Owlでは{label}分野のコンテスト情報を毎日自動収集しています。
-            AIがあなたのスキル・経験レベルに基づいて最適な案件を提案し、
-            勝率と期待収益を計算します。
-          </p>
-          <p>
-            無料アカウントを作成してプロフィールを設定するだけで、
-            AIがあなたに最適な{label}コンテストをレコメンドします。
-          </p>
+      ) : (
+        <div className="text-center py-20">
+          <div className="text-5xl mb-4">🦉</div>
+          <p className="text-muted-foreground">現在{label}のコンテストは登録されていません</p>
         </div>
+      )}
 
-        <div className="mt-8 text-center">
-          <Button variant="gradient" size="lg" asChild>
+      {/* SEO text */}
+      <div className="mt-4 p-6 bg-muted/40 rounded-2xl text-sm text-muted-foreground leading-relaxed space-y-2">
+        <h2 className="font-bold text-base text-foreground">{label}コンテストで稼ぐ方法</h2>
+        <p>
+          Bounty Owlでは{label}分野のコンテスト情報を毎日AIが自動収集しています。
+          アカウントを作成してプロフィールを設定すると、AIがあなたのスキル・経験・言語に基づいて
+          勝率と期待収益を計算したレコメンドを提供します。
+        </p>
+        <div className="mt-3">
+          <Button variant="gradient" asChild>
             <Link href="/signup">
               無料でAIレコメンドを受け取る
               <ArrowRight className="h-4 w-4" />
@@ -120,4 +115,20 @@ export default async function ContestCategoryPage({ params }: Props) {
       </div>
     </div>
   );
+}
+
+function getCategoryAccentClass(category: string): string {
+  const map: Record<string, string> = {
+    novel: "bg-amber-400",
+    illustration: "bg-pink-400",
+    programming: "bg-blue-500",
+    ai: "bg-purple-500",
+    photography: "bg-green-500",
+    video: "bg-red-500",
+    design: "bg-orange-400",
+    startup: "bg-indigo-500",
+    research: "bg-teal-500",
+    scholarship: "bg-cyan-500",
+  };
+  return map[category] ?? "bg-gray-400";
 }
