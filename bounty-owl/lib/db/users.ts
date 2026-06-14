@@ -47,15 +47,20 @@ export async function updateUser(id: string, updates: Partial<User>) {
   return data as User;
 }
 
-export async function getSubscription(userId: string) {
-  const { data, error } = await supabaseAdmin
-    .from("subscriptions")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
-
-  if (error) throw error;
-  return data as Subscription;
+export async function getSubscription(userId: string): Promise<Subscription> {
+  // Private single-user app: always premium, no Stripe needed
+  return {
+    id: "private",
+    user_id: userId,
+    stripe_customer_id: null,
+    stripe_subscription_id: null,
+    plan: "premium",
+    status: "active",
+    current_period_end: null,
+    cancel_at_period_end: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
 }
 
 export async function updateSubscription(userId: string, updates: Partial<Subscription>) {

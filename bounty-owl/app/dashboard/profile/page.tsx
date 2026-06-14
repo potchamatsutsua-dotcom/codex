@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, User, Globe, Languages, Layers, Award, Sparkles, CreditCard } from "lucide-react";
+import { Save, User, Languages, Layers, Award, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
-import type { Profile, User as UserType, Subscription } from "@/types";
+import type { Profile, User as UserType } from "@/types";
 
 const CATEGORIES = [
   { id: "novel", label: "小説", emoji: "📚" },
@@ -38,17 +38,10 @@ const EXPERIENCE_LEVELS = [
   { id: "professional", label: "プロ" },
 ];
 
-const PLAN_LABELS = { free: "Free", pro: "Pro", premium: "Premium" };
-const PLAN_COLORS = {
-  free: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
-  pro: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  premium: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-};
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserType | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [name, setName] = useState("");
@@ -65,10 +58,9 @@ export default function ProfilePage() {
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => r.json())
-      .then((data: { user: UserType; profile: Profile; subscription: Subscription }) => {
+      .then((data: { user: UserType; profile: Profile }) => {
         setUser(data.user);
         setProfile(data.profile);
-        setSubscription(data.subscription);
         setName(data.user?.name ?? "");
         setBio(data.profile?.bio ?? "");
         setPortfolioUrl(data.profile?.portfolio_url ?? "");
@@ -110,22 +102,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleUpgrade = async (plan: "pro" | "premium") => {
-    const res = await fetch("/api/stripe/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan }),
-    });
-    const data = await res.json() as { url?: string };
-    if (data.url) window.location.href = data.url;
-  };
-
-  const handleManageBilling = async () => {
-    const res = await fetch("/api/stripe/portal", { method: "POST" });
-    const data = await res.json() as { url?: string };
-    if (data.url) window.location.href = data.url;
-  };
-
   const toggle = (arr: string[], item: string, setter: (v: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item]);
   };
@@ -146,52 +122,6 @@ export default function ProfilePage() {
         <h1 className="text-2xl font-bold">プロフィール設定</h1>
         <p className="text-muted-foreground mt-1">プロフィールを充実させてAIの精度を上げましょう</p>
       </div>
-
-      {/* Subscription */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-amber-500" />
-            現在のプラン
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className={cn("px-3 py-1 rounded-full text-sm font-bold", PLAN_COLORS[subscription?.plan ?? "free"])}>
-                {PLAN_LABELS[subscription?.plan ?? "free"]}
-              </span>
-              {subscription?.current_period_end && (
-                <span className="text-xs text-muted-foreground">
-                  {new Date(subscription.current_period_end).toLocaleDateString("ja-JP")}まで
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              {subscription?.plan === "free" && (
-                <>
-                  <Button size="sm" variant="outline" onClick={() => handleUpgrade("pro")}>
-                    Proへ
-                  </Button>
-                  <Button size="sm" variant="gradient" onClick={() => handleUpgrade("premium")}>
-                    Premiumへ
-                  </Button>
-                </>
-              )}
-              {subscription?.plan === "pro" && (
-                <Button size="sm" variant="gradient" onClick={() => handleUpgrade("premium")}>
-                  Premiumへ
-                </Button>
-              )}
-              {subscription?.stripe_customer_id && (
-                <Button size="sm" variant="ghost" onClick={handleManageBilling}>
-                  請求管理
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Basic Info */}
       <Card>

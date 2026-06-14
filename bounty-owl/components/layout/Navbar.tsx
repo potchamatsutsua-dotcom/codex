@@ -155,14 +155,9 @@ export function Navbar({ user }: NavbarProps) {
               </button>
             </>
           ) : (
-            <>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/login">ログイン</Link>
-              </Button>
-              <Button variant="gradient" size="sm" className="font-bold" asChild>
-                <Link href="/signup">無料で始める</Link>
-              </Button>
-            </>
+            <Button variant="gradient" size="sm" className="font-bold" asChild>
+              <Link href="/login">ログイン</Link>
+            </Button>
           )}
         </div>
       </div>

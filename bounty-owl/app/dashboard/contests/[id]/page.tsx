@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Trophy, Clock, Users, Star, Globe, Lock } from "lucide-react";
+import { ArrowLeft, ExternalLink, Trophy, Clock, Users, Star, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { requireAuth } from "@/lib/auth/server";
 import { getContestById } from "@/lib/db/contests";
-import { getUserProfile, getSubscription } from "@/lib/db/users";
 import {
   cn,
   formatCurrency,
@@ -26,14 +25,10 @@ export default async function ContestDetailPage({
 }) {
   const authUser = await requireAuth();
 
-  const [contest, subscription] = await Promise.all([
-    getContestById(params.id, authUser.id).catch(() => null),
-    getSubscription(authUser.id).catch(() => null),
-  ]);
+  const contest = await getContestById(params.id, authUser.id).catch(() => null);
 
   if (!contest) notFound();
 
-  const isPremium = subscription?.plan === "premium";
   const analysis = contest.contest_analysis;
   const match = contest.user_matches;
   const difficultyStars = getDifficultyStars(analysis?.difficulty_score ?? null);
@@ -184,38 +179,17 @@ export default async function ContestDetailPage({
             </Card>
           )}
 
-          {/* Strategy Report (Premium) */}
-          <Card className={cn(!isPremium && "opacity-80")}>
+          {/* Strategy Report */}
+          <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                {isPremium ? "🎯" : <Lock className="h-4 w-4 text-amber-500" />}
-                AI攻略レポート
-                {!isPremium && <Badge variant="warning" className="ml-auto">Premium限定</Badge>}
+                🎯 AI攻略レポート
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {isPremium ? (
-                <Button variant="gradient" className="w-full">
-                  攻略レポートを生成する
-                </Button>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Premiumプランで以下の分析が利用可能：
-                  </p>
-                  <ul className="text-sm text-left space-y-1 mb-4">
-                    {["この賞で評価される傾向", "過去受賞者の共通点", "落選しやすい要素", "あなたへの改善ポイント"].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-muted-foreground">
-                        <span className="text-amber-500">✦</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="gradient" asChild>
-                    <Link href="/pricing">Premiumにアップグレード</Link>
-                  </Button>
-                </div>
-              )}
+              <Button variant="gradient" className="w-full">
+                攻略レポートを生成する
+              </Button>
             </CardContent>
           </Card>
         </div>
